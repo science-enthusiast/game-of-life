@@ -1,0 +1,4 @@
+bin/*
+output/*
+!bin/.gitkeep
+!output/.gitkeep

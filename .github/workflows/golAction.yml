@@ -1,0 +1,24 @@
+name: Game of life CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install mingw
+      run: sudo apt-get install g++-mingw-w64 mingw-w64-{tools,x86-64-dev}
+    - name: install cppunit
+      run: sudo apt install -y libcppunit-dev
+    - name: make
+      run: make
+    - name: run test
+      run: ./bin/gol_test
+ 
