@@ -3,17 +3,14 @@
 // July 2024
 // Requires C++17 or later.
 
-#ifndef GAME_OF_LIFE_GOL_H_
-#define GAME_OF_LIFE_GOL_H_
+#ifndef GOL_SRC_GAME_OF_LIFE_H_
+#define GOL_SRC_GAME_OF_LIFE_H_
 
-#include <cstdlib>
+#include <cstdint>
 #include <deque>
 #include <filesystem>
 
-// Describe input file
-void aboutInputFile();
-// Print CLI usage 
-void cliUsage();
+namespace gol {
 // Load data from file
 std::deque<std::deque<std::uint8_t>> loadFile(std::filesystem::path);
 // Check whether a given cell should be dead or alive
@@ -22,6 +19,9 @@ std::uint8_t deadOrAlive(const std::uint64_t, const std::uint64_t,
 // Run one iteration of Game of Life rules
 std::deque<std::deque<std::uint8_t>>
 runOneIter(std::deque<std::deque<std::uint8_t>> &);
+
+void runGol(const std::string &, const int, const bool);
+}
 
 #endif
 

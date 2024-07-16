@@ -4,36 +4,14 @@
 // Requires C++17 or later.
 
 #include "game_of_life.h"
+#include "util.h"
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
-void aboutInputFile() {
-  std::cout << "Input should be a text file.\n";
-  std::cout << "One empty (dead) cell is encoded as `_`,";
-  std::cout << " one living cell is encoded as `*`.\n";
-  std::cout << "Lines terminated by newline character `\\n`.\n";
-  std::cout << "No other characters should be present.\n";
-  std::cout << "In a valid input, all lines must have same length.\n";
-}
-
-void cliUsage() {
-  std::cout << "Usage:\n";
-  std::cout << "The following parameters are mandatory:\n";
-  std::cout << "--input: input file path as string.";
-  std::cout << " Data must be in the format described below.\n";
-  std::cout << "--iterations: A positive integer.\n";
-  std::cout << "The following parameter is optional:\n";
-  std::cout << "--all: It will print all the iterations.\n";
-  std::cout << "Example:\n";
-  std::cout << "./game_of_life_exe --input gof_init.txt";
-  std::cout << " --iterations 1000 --all\n";
-  std::cout << "\n";
-  aboutInputFile();
-}
+namespace gol {
 
 std::deque<std::deque<std::uint8_t>>
 loadFile(std::filesystem::path file_path) {
@@ -167,4 +145,60 @@ runOneIter(std::deque<std::deque<std::uint8_t>> &first_grid) {
 
   return second_grid;
 }
+
+void runGol(const std::string &init_file_name, 
+            const int num_iter, const bool print_iters) {
+  // need two grids: current grid and next grid.
+  std::deque<std::deque<std::uint8_t>> first_grid, second_grid;
+
+  first_grid = loadFile(init_file_name);
+
+  std::uint8_t line_len;
+
+  // input with all empty rows is still valid
+  if (first_grid.size() == 0) {
+    line_len = 0;
+  } else {
+    line_len = first_grid[0].size();
+  }
+
+  // obtain the extension and the stem of the filename
+  std::filesystem::path init_path(init_file_name);
+  auto file_ext = init_path.extension(); 
+  auto file_stem = init_path.stem();
+
+  for (std::int64_t iter_i = 0; iter_i < num_iter; ++iter_i) {
+    if (line_len != 0) { 
+      second_grid = runOneIter(first_grid);
+     
+      if (print_iters || iter_i == num_iter - 1) {
+        std::string op_file_name = "output/" + file_stem.generic_string()
+                                   + "_" + std::to_string(iter_i)
+                                   + file_ext.generic_string();
+        std::ofstream op_file(op_file_name);
+        if (op_file) {
+          for (const auto &line_i : second_grid) {
+            for (const auto &bool_val : line_i) {
+              if (bool_val)  {
+                op_file << "*";
+              } else {
+                op_file << "_";
+              }
+            }
+            op_file << "\n";
+          }
+        }
+      }
+      first_grid = std::move(second_grid);
+      second_grid.clear();
+      if (first_grid.size() == 0) {
+        line_len = 0;
+      } else {
+        line_len = first_grid[0].size();
+      }
+    } // if (line_len != 0)
+  } // for iter_i
+}
+
+} // namespace gol
 

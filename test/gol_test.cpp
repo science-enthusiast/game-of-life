@@ -19,7 +19,7 @@ class GolTestOne : public CppUnit::TestCase {
 
  public:
   void testCaseOne() {
-    CPPUNIT_ASSERT(testOneIter("input/gol_input.txt", "test/gol_input_test.txt"));
+    CPPUNIT_ASSERT(gol::testOneIter("input/gol_input.txt", "test/gol_input_test.txt"));
   }
 };
 
